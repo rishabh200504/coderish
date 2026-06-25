@@ -128,7 +128,7 @@ let isDarkTheme     = true;
 // Dynamic Backend URL routing (detect local environment vs deployed Netlify production)
 const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
   ? "/api/run"
-  : "https://coderish-backend.onrender.com/api/run";
+  : "https://coderish.onrender.com/api/run";
 
 
 /* ══════════════════════════════════════════════════════════════
