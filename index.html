@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coderish IDE — Online Compiler</title>
+  <meta name="description" content="A student-friendly online compiler supporting MiniLang, Python, C, C++, and Java with a live terminal and AST inspector." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER / TOOLBAR
+  ══════════════════════════════════════════════════════════ -->
+  <header class="header" id="main-header">
+    <div class="header-brand">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="10" fill="url(#logo-grad)"/>
+          <path d="M12 15l-5 5 5 5M28 15l5 5-5 5M22 12l-4 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="logo-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Coderish</span>
+        <span class="brand-tagline">Online IDE</span>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Language Selector -->
+      <div class="lang-selector-wrapper" id="lang-selector-wrapper">
+        <label for="lang-select" class="sr-only">Select Language</label>
+        <div class="lang-selector" id="lang-selector">
+          <div class="lang-icon" id="lang-icon" aria-hidden="true"></div>
+          <select id="lang-select" aria-label="Programming Language">
+            <option value="minilang" data-icon="🔬">MiniLang</option>
+            <option value="python"   data-icon="🐍">Python</option>
+            <option value="c"        data-icon="⚙️">C</option>
+            <option value="cpp"      data-icon="🔷">C++</option>
+            <option value="java"     data-icon="☕">Java</option>
+          </select>
+          <svg class="lang-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- Font Size -->
+      <div class="font-control" title="Editor font size">
+        <button id="btn-font-decrease" aria-label="Decrease font size">A-</button>
+        <span id="font-size-label">15px</span>
+        <button id="btn-font-increase" aria-label="Increase font size">A+</button>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button class="icon-btn" id="btn-theme" title="Toggle editor theme" aria-label="Toggle theme">
+        <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" width="18" height="18" style="display:none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+
+      <!-- Clear -->
+      <button class="icon-btn" id="btn-clear" title="Clear editor" aria-label="Clear editor">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <!-- Copy -->
+      <button class="icon-btn" id="btn-copy" title="Copy code" aria-label="Copy code">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+
+      <!-- RUN BUTTON -->
+      <button class="btn-run" id="btn-run" aria-label="Run code">
+        <svg class="run-icon" viewBox="0 0 24 24" fill="none" width="18" height="18"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>
+        <span class="run-label">Run</span>
+        <kbd class="run-shortcut">Ctrl+Enter</kbd>
+        <div class="run-spinner" id="run-spinner" aria-hidden="true"></div>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MAIN LAYOUT: EDITOR + SIDEBAR
+  ══════════════════════════════════════════════════════════ -->
+  <main class="workspace" id="workspace">
+
+    <!-- LEFT: Monaco Editor Pane -->
+    <section class="editor-pane" aria-label="Code Editor">
+      <div class="pane-header">
+        <div class="pane-tabs">
+          <div class="pane-tab active" id="editor-tab-label">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span id="editor-filename">main.ml</span>
+          </div>
+        </div>
+        <div class="pane-meta" id="cursor-pos">Ln 1, Col 1</div>
+      </div>
+      <div id="monaco-editor" role="textbox" aria-label="Code Editor" aria-multiline="true"></div>
+    </section>
+
+    <!-- RIGHT: Sidebar (Terminal + MiniLang Inspector) -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Terminal Panel -->
+      <div class="panel terminal-panel" id="terminal-panel">
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <span class="panel-dot dot-red"></span>
+            <span class="panel-dot dot-yellow"></span>
+            <span class="panel-dot dot-green"></span>
+            <h2 class="panel-title">Terminal</h2>
+          </div>
+          <div class="panel-header-right">
+            <span class="terminal-badge" id="terminal-badge">idle</span>
+            <button class="icon-btn icon-btn-sm" id="btn-clear-terminal" title="Clear terminal" aria-label="Clear terminal output">
+              <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="terminal-body" id="terminal-body" role="log" aria-label="Terminal Output" aria-live="polite">
+          <div class="terminal-welcome">
+            <span class="term-prompt">coderish</span><span class="term-at">@</span><span class="term-host">ide</span><span class="term-sym">:~$</span>
+            <span class="term-cmd"> Welcome! Select a language and press <kbd>Run</kbd> or <kbd>Ctrl+Enter</kbd>.</span>
+          </div>
+        </div>
+        <div class="terminal-statusbar" id="terminal-statusbar">
+          <span id="status-lang">MiniLang</span>
+          <span id="status-time"></span>
+          <span id="status-exit"></span>
+        </div>
+      </div>
+
+      <!-- MiniLang Inspector Panel (only visible for MiniLang) -->
+      <div class="panel inspector-panel" id="inspector-panel" aria-hidden="true">
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h2 class="panel-title">MiniLang Inspector</h2>
+          </div>
+          <div class="inspector-tabs" role="tablist">
+            <button class="insp-tab active" id="tab-tokens"    role="tab" aria-selected="true"  aria-controls="view-tokens">Tokens</button>
+            <button class="insp-tab"        id="tab-ast"       role="tab" aria-selected="false" aria-controls="view-ast">AST</button>
+            <button class="insp-tab"        id="tab-bytecode"  role="tab" aria-selected="false" aria-controls="view-bytecode">Bytecode</button>
+            <button class="insp-tab"        id="tab-vars"      role="tab" aria-selected="false" aria-controls="view-vars">Variables</button>
+          </div>
+        </div>
+
+        <div class="inspector-body">
+          <!-- Tokens View -->
+          <div class="insp-view active" id="view-tokens" role="tabpanel" aria-labelledby="tab-tokens">
+            <div class="insp-placeholder" id="tokens-placeholder">Run MiniLang code to see the token stream.</div>
+            <table class="insp-table" id="tokens-table" style="display:none">
+              <thead><tr><th>#</th><th>Type</th><th>Value</th><th>Line</th></tr></thead>
+              <tbody id="tokens-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- AST View -->
+          <div class="insp-view" id="view-ast" role="tabpanel" aria-labelledby="tab-ast">
+            <div class="insp-placeholder" id="ast-placeholder">Run MiniLang code to see the Abstract Syntax Tree.</div>
+            <ul class="ast-list" id="ast-list" style="display:none"></ul>
+          </div>
+
+          <!-- Bytecode View -->
+          <div class="insp-view" id="view-bytecode" role="tabpanel" aria-labelledby="tab-bytecode">
+            <div class="insp-placeholder" id="bytecode-placeholder">Run MiniLang code to see the compiled bytecode.</div>
+            <div class="bytecode-list" id="bytecode-list" style="display:none"></div>
+          </div>
+
+          <!-- Variables View -->
+          <div class="insp-view" id="view-vars" role="tabpanel" aria-labelledby="tab-vars">
+            <div class="insp-placeholder" id="vars-placeholder">Run MiniLang code to see the final variable state.</div>
+            <table class="insp-table" id="vars-table" style="display:none">
+              <thead><tr><th>Variable</th><th>Value</th></tr></thead>
+              <tbody id="vars-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       NOTIFICATION TOAST
+  ══════════════════════════════════════════════════════════ -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Monaco Editor from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

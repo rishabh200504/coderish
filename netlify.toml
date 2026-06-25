@@ -1,0 +1,6 @@
+[build]
+  publish = "."
+
+# Since it's a simple static site with no build step:
+[build.processing]
+  skip_processing = true
